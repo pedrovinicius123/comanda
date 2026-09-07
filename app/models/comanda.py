@@ -6,7 +6,7 @@ class Atendimento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     atendente_id = db.Column(db.Integer, db.ForeignKey("atendente.id"), nullable=False)
     comandas = db.relationship("Comanda", backref="atendimento", lazy=True, cascade="all, delete-orphan")
-    inicio = db.Column(db.DateTime, default=datetime.now())
+    inicio = db.Column(db.DateTime, default=datetime.now)
     fim = db.Column(db.DateTime)
 
 class Comanda(db.Model):

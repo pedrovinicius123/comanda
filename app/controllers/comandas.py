@@ -1,8 +1,9 @@
 from flask import request
-from flask_login import user_logged_in, current_user
-from ..schemas.comanda_schema import *
+from flask_login import current_user
+from ..models.comanda import Atendimento, Comanda, Produto
+from ..schemas.comanda_schema import AtendimentoSchema, ComandaSchema, ProdutoSchema
 from ..utils.modules import db
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import BadRequest, NotFound
 from datetime import datetime
 
 comanda_schema = ComandaSchema()
@@ -11,8 +12,8 @@ produto_schema = ProdutoSchema()
 produtos_schema = ProdutoSchema(many=True)
 
 def iniciar_atendimento_controller():
-    data = {**request.json, "atendente_id": current_user.id}
-    atendimento = atendimento_schema.load(data)
+    data = {**(request.get_json(silent=True) or {}), "atendente_id": current_user.id}
+    atendimento = Atendimento(**atendimento_schema.load(data))
     comanda = Comanda()
     atendimento.comandas.append(comanda)
 
@@ -20,31 +21,40 @@ def iniciar_atendimento_controller():
     db.session.commit()
 
 def finalizar_atendimento_controller():
-    id_atendimento = request.json.get("id")
-    atendimento = Atendimento.query.get(id_atendimento)
+    id_atendimento = (request.get_json(silent=True) or {}).get("id")
+    atendimento = db.session.get(Atendimento, id_atendimento)
+    if atendimento is None:
+        raise BadRequest("Atendimento não encontrado")
     atendimento.fim = datetime.now()
 
     db.session.commit()
 
 def registrar_comanda_controller():
-    comanda = comanda_schema.load(request.json)
+    comanda = Comanda(**comanda_schema.load(request.get_json(silent=True) or {}))
 
     db.session.add(comanda)
     db.session.commit()   
 
 def pagar_comandas_parcial_controller():
-    comanda = Comanda.query.get(request.json.get("id"))
-    
-    valor_pago = request.json.get("valor")
+    data = request.get_json(silent=True) or {}
+    comanda = db.session.get(Comanda, data.get("id"))
+    if comanda is None:
+        raise BadRequest("Comanda não encontrada")
+    valor_pago = data.get("valor", 0)
     comanda.valor_a_pagar = max(0, comanda.valor_a_pagar-valor_pago)
     db.session.commit()
 
 def adicionar_produtos_controller():
-    comanda_id = request.json.get("c_id")
-    produtos_json = request.json.get("prods", [])
-    produtos = produtos_schema.load(produtos_json)
+    data = request.get_json(silent=True) or {}
+    comanda_id = data.get("c_id")
+    produtos_json = data.get("prods", [])
+    for produto in produtos_json:
+        produto["id_commanda"] = comanda_id
+    produtos = [Produto(**produto) for produto in produtos_schema.load(produtos_json)]
     
-    comanda = Comanda.query.get_or_404(comanda_id)
+    comanda = db.session.get(Comanda, comanda_id)
+    if comanda is None:
+        raise NotFound("Comanda não encontrada")
     comanda.produtos.extend(produtos)
 
     db.session.commit()

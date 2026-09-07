@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint
 from flask_login import login_required
 from ..controllers.comandas import (
     iniciar_atendimento_controller,
@@ -25,7 +25,7 @@ def finalizar_atendimento():
 
 @bp.route("/comandas", methods=["POST"])
 @login_required
-def registrar_comanda_controller():
+def registrar_comanda():
     registrar_comanda_controller()
     return "Comanda registrada com sucesso", 201
 
