@@ -4,12 +4,12 @@
 
 /* Disponível: fundo cinza claro e negrito */
 .badge.disponivel {
-  background: #eaeaea;
-  font-weight: bold;
+    background: #eaeaea;
+    font-weight: bold;
 }
 
 /* Indisponível: fundo branco e itálico */
 .badge.indisponivel {
-  background: #ffffff;
-  font-style: italic;
+    background: #ffffff;
+    font-style: italic;
 }
