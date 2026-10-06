@@ -1,5 +1,5 @@
-import { mesas } from "../data/mesa.js"
-import { Mesa } from "../classes/mesas.js"
+import { addMesa, updateMesa, removeMesa } from "../data/mesa.js"
+import { Mesa } from "../classes/Mesas.js"
 
 let idEmEdicao = null;
 
@@ -13,6 +13,9 @@ const tituloForm       = document.getElementById('titulo-form');
 const listaMesas       = document.getElementById('lista-mesas');
 
 function iniciarEdicao(id) {
+
+    const mesas = localStorage.getItem("mesas");
+    if (!mesas) return;
     const mesa = mesas.find((m) => m.id === id);
     if (!mesa) return;
   
@@ -35,21 +38,23 @@ function iniciarEdicao(id) {
 
 export function renderizar(){
     listaMesas.innerHTML = '';
+    if (localStorage.hasOwnProperty("mesas")){
+        if (mesas.length === 0) {
+            const vazio = document.createElement('p');
+            vazio.className = 'vazio';
+            vazio.textContent = 'Nenhuma mesa cadastrada.';
+            listaMesas.append(vazio);
+            return;
+        }
 
-    if (mesas.length === 0) {
-        const vazio = document.createElement('p');
-        vazio.className = 'vazio';
-        vazio.textContent = 'Nenhuma mesa cadastrada.';
-        listaMesas.append(vazio);
-        return;
+        // Exibe em ordem crescente de número (sem alterar o array original)
+        const ordenadas = [...mesas].sort((a, b) => a.numero - b.numero);
+        ordenadas.forEach((mesa) => {
+            listaMesas.appendChild(mesa.render(iniciarEdicao));
+
+        });
+    
     }
-
-    // Exibe em ordem crescente de número (sem alterar o array original)
-    const ordenadas = [...mesas].sort((a, b) => a.numero - b.numero);
-    ordenadas.forEach((mesa) => {
-        listaMesas.appendChild(mesa.render(iniciarEdicao));
-
-    });
 
 }
 
@@ -78,7 +83,7 @@ if (form != null){
 
             if (Number.isNaN(numero) || !localizacao) return;
 
-            mesas.push(new Mesa(numero, localizacao, reservada));
+            updateMesa(new Mesa(numero, localizacao, reservada));
             form.reset();
             campoNumero.focus();
         } else {
@@ -91,6 +96,8 @@ if (form != null){
                 mesa.localizacao = localizacao;
                 mesa.atualizar_reserva = reservada;
             }
+
+            updateMesa(mesa);
             finalizarEdicao();
         }
         renderizar();

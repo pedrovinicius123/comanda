@@ -1,5 +1,5 @@
-import { lista_produtos } from "../data/produto.js";
-import { Produto } from "../classes/produtos.js";
+import { Produto } from "../classes/Produtos.js";
+import { updateProduto } from "../data/produtos.js";
 
 let idEmEdicao = null;
 
@@ -14,7 +14,7 @@ const tituloForm      = document.getElementById('titulo-form');
 const listaProdutos   = document.getElementById('lista-produtos');
 
 function iniciarEdicao(id) {
-    const produto = lista_produtos.find((p) => p.id === id);
+    const produto = localStorage.getItem("produtos");
     if (!produto) return;
 
     idEmEdicao = id;
@@ -35,8 +35,8 @@ function iniciarEdicao(id) {
 
 export function renderizar() {
     listaProdutos.innerHTML = '';
-    console.log(lista_produtos.length);
-    if (lista_produtos.length === 0) {
+    const lista_produtos = localStorage.getItem("produtos");
+    if (!lista_produtos || lista_produtos.length === 0) {
       const vazio = document.createElement('p');
       vazio.className = 'vazio';
       vazio.textContent = 'Nenhum produto cadastrado.';
@@ -45,7 +45,8 @@ export function renderizar() {
     }
 
     lista_produtos.forEach((produto) => {
-        listaProdutos.appendChild(produto.render(iniciarEdicao));
+        const prod = Produto.load(produto) 
+        listaProdutos.appendChild(prod.render(iniciarEdicao));
     });
 
 }
@@ -78,7 +79,7 @@ if (form != null){
 
         if (idEmEdicao === null) {
             // Cadastro: cria um novo objeto instanciado da classe Produto
-            lista_produtos.push(new Produto(nome, descricao, preco, disponivel));
+            updateProduto(new Produto(nome, descricao, preco, disponivel));
             form.reset();
             campoNome.focus();
         } else {

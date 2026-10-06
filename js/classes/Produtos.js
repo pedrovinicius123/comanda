@@ -100,4 +100,24 @@ export class Produto {
 
     return item
   }
+
+  jsonify() {
+    const obj = {
+      id:this.#id,
+      nome: this.#nome,
+      descricao: this.#descricao,
+      preco: this.#preco,
+      disponivel: this.#disponivel
+    };
+
+    return JSON.stringify(obj);
+
+  }
+
+  static load(json) {
+    const obj = JSON.parse(json);
+    const produto = new Produto(obj.nome, obj.descricao, obj.preco, obj.disponivel);
+    return produto;
+  }
+
 }
