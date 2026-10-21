@@ -1,5 +1,6 @@
 import { addMesa, updateMesa, removeMesa } from "../data/mesa.js"
 import { Mesa } from "../classes/Mesas.js"
+import { renderMesa } from "./componentes.js"
 
 let idEmEdicao = null;
 
@@ -12,10 +13,12 @@ const btnCancelar      = document.getElementById('btn-cancelar');
 const tituloForm       = document.getElementById('titulo-form');
 const listaMesas       = document.getElementById('lista-mesas');
 
+/** Preenche o formulário com os dados da mesa selecionada. */
 function iniciarEdicao(id) {
 
-    const mesas = localStorage.getItem("mesas");
-    if (!mesas) return;
+    const mesas = JSON.parse(localStorage.getItem("mesas") || "[]").map((mesa) =>
+        typeof mesa === "string" ? JSON.parse(mesa) : mesa
+    );
     const mesa = mesas.find((m) => m.id === id);
     if (!mesa) return;
   
@@ -36,25 +39,27 @@ function iniciarEdicao(id) {
 
 
 
+/** Reconstrói a lista de mesas a partir dos dados persistidos. */
 export function renderizar(){
     listaMesas.innerHTML = '';
-    if (localStorage.hasOwnProperty("mesas")){
-        if (mesas.length === 0) {
-            const vazio = document.createElement('p');
-            vazio.className = 'vazio';
-            vazio.textContent = 'Nenhuma mesa cadastrada.';
-            listaMesas.append(vazio);
-            return;
-        }
-
-        // Exibe em ordem crescente de número (sem alterar o array original)
-        const ordenadas = [...mesas].sort((a, b) => a.numero - b.numero);
-        ordenadas.forEach((mesa) => {
-            listaMesas.appendChild(mesa.render(iniciarEdicao));
-
-        });
-    
+    const mesas = JSON.parse(localStorage.getItem("mesas") || "[]").map((mesa) =>
+        typeof mesa === "string" ? JSON.parse(mesa) : mesa
+    );
+    if (mesas.length === 0) {
+        const vazio = document.createElement('p');
+        vazio.className = 'vazio';
+        vazio.textContent = 'Nenhuma mesa cadastrada.';
+        listaMesas.append(vazio);
+        return;
     }
+
+    // Exibe em ordem crescente de número (sem alterar o array original)
+    const ordenadas = [...mesas].sort((a, b) => a.numero - b.numero);
+    ordenadas.forEach((mesaData) => {
+        const mesa = new Mesa(mesaData.id, mesaData.numero, mesaData.localizacao, mesaData.reservada);
+        listaMesas.appendChild(renderMesa(mesa, iniciarEdicao, renderizar));
+
+    });
 
 }
 
@@ -83,21 +88,22 @@ if (form != null){
 
             if (Number.isNaN(numero) || !localizacao) return;
 
-            updateMesa(new Mesa(numero, localizacao, reservada));
+            updateMesa(new Mesa(numero, numero, localizacao, reservada));
             form.reset();
             campoNumero.focus();
         } else {
         // Alteração: modifica o objeto já existente no array
-            const mesa = mesas.find((m) => m.id === idEmEdicao);
+            const mesas = JSON.parse(localStorage.getItem("mesas") || "[]").map((mesa) =>
+                typeof mesa === "string" ? JSON.parse(mesa) : mesa
+            );
+            const mesaExistente = mesas.find((m) => m.id === idEmEdicao);
             const localizacao = campoLocalizacao.value.trim();
             const reservada   = campoReservada.value === 'true';
 
-            if (mesa && localizacao) {
-                mesa.localizacao = localizacao;
-                mesa.atualizar_reserva = reservada;
+            if (mesaExistente && localizacao) {
+                updateMesa(new Mesa(mesaExistente.id, mesaExistente.numero, localizacao, reservada));
             }
 
-            updateMesa(mesa);
             finalizarEdicao();
         }
         renderizar();

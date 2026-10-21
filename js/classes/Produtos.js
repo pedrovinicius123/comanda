@@ -1,3 +1,4 @@
+/** Representa um produto do cardápio e sua disponibilidade. */
 export class Produto {
   static proximoId = 1;
   #id
@@ -45,78 +46,31 @@ export class Produto {
     });
   }
 
-  render(edit_callback) {
-    /* ---- Bloco de informações ---- */
-    const info = document.createElement('div');
-    info.className = 'item-info';
-
-    const titulo = document.createElement('h3');
-    titulo.textContent = this.nome;
-
-    const descricao = document.createElement('p');
-    descricao.className = 'descricao';
-    descricao.textContent = this.descricao;
-
-    const preco = document.createElement('p');
-    preco.className = 'preco';
-    preco.textContent = this.precoFormatado();
-
-    info.append(titulo, descricao, preco);
-
-    /* ---- Bloco de ações ---- */
-    const acoes = document.createElement('div');
-    acoes.className = 'item-acoes';
-
-    // Ação própria de disponibilidade (o clique alterna a situação)
-    const btnDisponibilidade = document.createElement('button');
-    btnDisponibilidade.type = 'button';
-    btnDisponibilidade.className =
-      'badge ' + (this.disponivel ? 'disponivel' : 'indisponivel');
-    btnDisponibilidade.textContent =
-      this.disponivel ? 'Disponível' : 'Indisponível';
-    btnDisponibilidade.title = 'Clique para alternar a disponibilidade';
-    
-    let item = null;
-    btnDisponibilidade.addEventListener('click', () => {
-      this.alternarDisponibilidade();
-      item = this.render(edit_callback);
-    });
-
-    // Ação de edição
-    const btnEditar = document.createElement('button');
-    btnEditar.type = 'button';
-    btnEditar.className = 'btn-editar';
-    btnEditar.textContent = 'Alterar';
-    btnEditar.addEventListener('click', () => edit_callback(this.id));
-
-    acoes.append(btnDisponibilidade, btnEditar);
-
-    /* ---- Montagem do item ---- */
-    if (item == null){
-      item = document.createElement("article")
-      item.className = 'item';
-      item.append(info, acoes);
-    }
-
-    return item
-  }
-
+  /** Serializa os dados do produto para armazenamento.
+   * @returns {string} JSON do produto.
+   */
   jsonify() {
+    console.log(this.id);
     const obj = {
-      id:this.#id,
-      nome: this.#nome,
-      descricao: this.#descricao,
-      preco: this.#preco,
-      disponivel: this.#disponivel
+      id:this.id,
+      nome: this.nome,
+      descricao: this.descricao,
+      preco: this.preco,
+      disponivel: this.disponivel
     };
 
     return JSON.stringify(obj);
 
   }
 
+  /** Cria uma instância a partir de JSON ou de um objeto já decodificado.
+   * @param {string|object} json Dados serializados ou objeto do produto.
+   */
   static load(json) {
-    const obj = JSON.parse(json);
+    const obj = typeof json === "string" ? JSON.parse(json) : json;
     const produto = new Produto(obj.nome, obj.descricao, obj.preco, obj.disponivel);
+    produto.id = obj.id
+    Produto.proximoId--;
     return produto;
   }
 

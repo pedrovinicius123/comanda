@@ -1,5 +1,6 @@
 import { updateMesa } from "../data/mesa.js";
 
+/** Representa uma mesa e seus dados operacionais. */
 export class Mesa {
   static proximoId = 1;
 
@@ -69,56 +70,11 @@ export class Mesa {
     return this.#reservada ? 'Reservada' : 'Não reservada';
   }
 
-  render(edit_callback){
-    /* ---- Bloco de informações ---- */
-    const info = document.createElement('div');
-    info.className = 'item-info';
-
-    const titulo = document.createElement('h3');
-    titulo.textContent = 'Mesa ' + this.#numero;
-
-    const localizacao = document.createElement('p');
-    localizacao.className = 'descricao';
-    localizacao.textContent = this.#localizacao;
-
-    info.append(titulo, localizacao);
-
-    /* ---- Bloco de ações ---- */
-    const acoes = document.createElement('div');
-    acoes.className = 'item-acoes';
-
-    // Ação própria de reserva (o clique alterna a situação)
-    const btnReserva = document.createElement('button');
-
-    btnReserva.type = 'button';
-    btnReserva.className = 'badge ' + (this.#reservada ? 'reservada' : 'livre');
-    btnReserva.textContent = this.situacaoFormatada;
-    btnReserva.title = 'Clique para alternar a situação de reserva';
-    btnReserva.addEventListener('click', () => {
-      mesa.alternarReserva();
-      updateMesa(mesa);
-      renderizar();
-    });
-
-    // Ação de edição da localização (e também da reserva)
-    const btnEditar = document.createElement('button');
-    btnEditar.type = 'button';
-    btnEditar.className = 'btn-editar';
-    btnEditar.textContent = 'Alterar';
-    btnEditar.addEventListener('click', () => edit_callback(this.#id));
-
-    acoes.append(btnReserva, btnEditar);
-
-    /* ---- Montagem do item ---- */
-    const item = document.createElement('article');
-    item.className = 'item';
-    item.append(info, acoes);
-
-    return item;
-  }
-
+  /** Serializa a mesa e seus produtos para armazenamento.
+   * @returns {string} JSON da mesa.
+   */
   jsonify() {
-    obj = {
+    const obj = {
       id: this.#id,
       numero: this.#numero,
       localizacao: this.#localizacao,
@@ -133,7 +89,7 @@ export class Mesa {
   }
 
   static load(json, prodLoadCallback) {
-    const obj = JSON.parse(json);
+    const obj = typeof json === "string" ? JSON.parse(json) : json;
     const mesa = new Mesa(obj.id, obj.numero, obj.localizacao, obj.reservada);    
     const produtos = new Array()
     

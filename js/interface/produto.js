@@ -1,5 +1,6 @@
 import { Produto } from "../classes/Produtos.js";
 import { updateProduto } from "../data/produtos.js";
+import { renderProduto } from "./componentes.js"
 
 let idEmEdicao = null;
 
@@ -13,8 +14,12 @@ const btnCancelar     = document.getElementById('btn-cancelar');
 const tituloForm      = document.getElementById('titulo-form');
 const listaProdutos   = document.getElementById('lista-produtos');
 
+/** Preenche o formulário com os dados do produto selecionado. */
 function iniciarEdicao(id) {
-    const produto = localStorage.getItem("produtos");
+    const produtos = JSON.parse(localStorage.getItem("produtos") || "[]");
+    const produto = produtos
+        .map((item) => typeof item === "string" ? JSON.parse(item) : item)
+        .find((item) => item.id === id);
     if (!produto) return;
 
     idEmEdicao = id;
@@ -33,9 +38,10 @@ function iniciarEdicao(id) {
 }
   
 
+/** Reconstrói a lista de produtos a partir dos dados persistidos. */
 export function renderizar() {
     listaProdutos.innerHTML = '';
-    const lista_produtos = localStorage.getItem("produtos");
+    const lista_produtos = JSON.parse(localStorage.getItem("produtos"));
     if (!lista_produtos || lista_produtos.length === 0) {
       const vazio = document.createElement('p');
       vazio.className = 'vazio';
@@ -45,8 +51,12 @@ export function renderizar() {
     }
 
     lista_produtos.forEach((produto) => {
-        const prod = Produto.load(produto) 
-        listaProdutos.appendChild(prod.render(iniciarEdicao));
+        const prod = Produto.load(produto);
+        /*
+         Movemos o renderizador do produto para o arquivo de compontentes (./componentes.js)
+         Agora a função renderProduto(prod, iniciarEdicao) faz todo o trabalho de renderizar o produto e a sua edição
+         */
+        listaProdutos.appendChild(renderProduto(prod, iniciarEdicao, renderizar));
     });
 
 }
@@ -68,6 +78,8 @@ if (form != null){
         evento.preventDefault();
         console.log(campoPreco.value);
 
+        const lista_produtos = JSON.parse(localStorage.getItem("produtos") || "[]")
+            .map((produto) => typeof produto === "string" ? JSON.parse(produto) : produto);
         const nome       = campoNome.value.trim();
         const descricao  = campoDescricao.value.trim();
         const preco      = parseFloat(campoPreco.value);
@@ -84,11 +96,11 @@ if (form != null){
             campoNome.focus();
         } else {
             // Alteração: modifica o objeto já existente no array
-            const produto = lista_produtos.find((p) => p.id === idEmEdicao);
-            console.log(produto);
-            if (produto) {
+            const produtoData = lista_produtos.find((p) => p.id === idEmEdicao);
+            if (produtoData) {
+                const produto = Produto.load(produtoData);
                 produto.atualizarDados(nome, descricao, preco, disponivel);
-                console.log(produto);
+                updateProduto(produto);
             }
 
             finalizarEdicao();
