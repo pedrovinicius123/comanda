@@ -1,5 +1,5 @@
 import werkzeug.exceptions as exc
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect, render_template, url_for
 from flask_migrate import Migrate
 from marshmallow import ValidationError
 
@@ -38,9 +38,17 @@ def create_app():
     def unauthorized_error(error):
         return jsonify(error=error.description), error.code
 
+    @app.route("/login", methods=["GET"])
+    def login():
+        return render_template("register_atendente.html", login=True)
+
+    @app.route("/logon", methods=["GET"])
+    def logon():
+        return render_template("register_atendente.html", login=False)
+
     @lm.unauthorized_handler
-    def unauthorized(error):
-        return jsonify(error="Autenticação necessária"), error.code
+    def unauthorized():
+        return redirect(url_for("login"))
 
     app.register_blueprint(bp_atendente)
     app.register_blueprint(bp_atendimento)

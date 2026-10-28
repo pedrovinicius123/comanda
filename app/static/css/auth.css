@@ -1,0 +1,15 @@
+form {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: fit-content;
+
+    border: 2px solid black;
+    text-align: left;
+}
+
+form input {
+    border: 2px solid black;
+    border-radius: 20px;
+
+}

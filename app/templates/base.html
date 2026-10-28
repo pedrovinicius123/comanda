@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} {% endblock %}</title>
+  {% block link %} {% endblock %}  
+</head>
+<body>
+
+<!-- Barra superior -->
+  <div class="topo">
+    <button type="button" title="Disponível em etapas futuras">Histórico</button>
+    <button type="button" title="Disponível em etapas futuras">{{user.name}}</button>
+  </div>
+
+  <!-- Cabeçalho -->
+  <header class="cabecalho">
+    <h1><a href="index.html">Sabor da Orla</a></h1>
+    <span class="data" id="data-atual"></span>
+  </header>
+
+  <!-- Barra de seção -->
+  <div class="barra-secao">{% block section %} {% endblock %}</div>
+
+  <!-- Conteúdo -->
+  <main class="conteudo">
+  {% block content %}
+  {% endblock %}
+  </main>
+
+  {% block script %}
+  {% endblock %}
+</body>
