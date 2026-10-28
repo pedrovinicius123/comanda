@@ -1,16 +1,13 @@
+import werkzeug.exceptions as exc
 from flask import Flask, jsonify
-from .config import Config
-from .utils.modules import db, msh, lm
 from flask_migrate import Migrate
+from marshmallow import ValidationError
 
-from .models.atendente import Atendente
-from .models.comanda import Atendimento, Comanda, Produto 
-
+from .config import Config
 from .routes.atendente import bp as bp_atendente
 from .routes.atendimento import bp as bp_atendimento
+from .utils.modules import db, lm, msh
 
-import werkzeug.exceptions as exc
-from marshmallow import ValidationError
 
 def create_app():
     app = Flask(__name__)
@@ -22,28 +19,28 @@ def create_app():
     lm.init_app(app)
 
     @app.errorhandler(exc.NotFound)
-    def not_found():
-        return "Resource not found", exc.NotFound.code
+    def not_found(error):
+        return "Resource not found", error.code
 
     @app.errorhandler(exc.InternalServerError)
-    def error():
-        return jsonify(error="Internal server error"), exc.InternalServerError.code
+    def error(error):
+        return jsonify(error="Internal server error"), error.code
 
     @app.errorhandler(ValidationError)
     def validation_error(error):
-        return jsonify(error="Dados inválidos", details=error.messages), 400
+        return jsonify(error="Dados inválidos", details=error.messages), error.code
 
     @app.errorhandler(exc.BadRequest)
     def bad_request(error):
-        return jsonify(error=error.description), exc.BadRequest.code
+        return jsonify(error=error.description), error.code
 
     @app.errorhandler(exc.Unauthorized)
     def unauthorized_error(error):
-        return jsonify(error=error.description), exc.Unauthorized.code
+        return jsonify(error=error.description), error.code
 
     @lm.unauthorized_handler
-    def unauthorized():
-        return jsonify(error="Autenticação necessária"), 401
+    def unauthorized(error):
+        return jsonify(error="Autenticação necessária"), error.code
 
     app.register_blueprint(bp_atendente)
     app.register_blueprint(bp_atendimento)

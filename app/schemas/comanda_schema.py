@@ -1,6 +1,7 @@
 from ..models.comanda import Atendimento, Comanda, Produto
 from ..utils.modules import msh
 
+
 class AtendimentoSchema(msh.SQLAlchemyAutoSchema):
     class Meta:
         model=Atendimento

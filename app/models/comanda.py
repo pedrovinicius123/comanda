@@ -1,5 +1,6 @@
-from ..utils.modules import db
 from datetime import datetime
+
+from ..utils.modules import db
 
 class Atendimento(db.Model):
     __tablename__="atendimento"

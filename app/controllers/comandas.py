@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from flask import request
 from flask_login import current_user
+from werkzeug.exceptions import BadRequest, NotFound
+
 from ..models.comanda import Atendimento, Comanda, Produto
 from ..schemas.comanda_schema import AtendimentoSchema, ComandaSchema, ProdutoSchema
 from ..utils.modules import db
-from werkzeug.exceptions import BadRequest, NotFound
-from datetime import datetime
 
 comanda_schema = ComandaSchema()
 atendimento_schema = AtendimentoSchema()

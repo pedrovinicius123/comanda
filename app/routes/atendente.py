@@ -1,15 +1,14 @@
-from flask import Blueprint, request
-from flask_login import login_user, logout_user, user_logged_in
-from ..utils.modules import db, lm
+from flask import Blueprint
+
+from ..controllers.atendentes import (
+    delete_atendente_controller,
+    logar_atendente_controller,
+    registrar_atendente_controller,
+    update_atendente_controller,
+)
 from ..models.atendente import Atendente
 from ..schemas.atendente_schema import AtendenteSchema
-from werkzeug.security import generate_password_hash, check_password_hash
-from ..controllers.atendentes import (
-    registrar_atendente_controller,
-    logar_atendente_controller,
-    update_atendente_controller,
-    delete_atendente_controller
-) 
+from ..utils.modules import db, lm
 
 atendente_loader = AtendenteSchema()
 bp = Blueprint("atendentes", __name__, url_prefix="/atendentes")

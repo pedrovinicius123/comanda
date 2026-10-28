@@ -1,11 +1,12 @@
 from flask import Blueprint
 from flask_login import login_required
+
 from ..controllers.comandas import (
-    iniciar_atendimento_controller,
+    adicionar_produtos_controller,
     finalizar_atendimento_controller,
-    registrar_comanda_controller,
+    iniciar_atendimento_controller,
     pagar_comandas_parcial_controller,
-    adicionar_produtos_controller
+    registrar_comanda_controller,
 )
 
 bp = Blueprint("atendimentos", __name__, url_prefix="/atendimentos")
