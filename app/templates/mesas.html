@@ -5,10 +5,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mesas.css') }}">
 {% endblock %}
+{% block page_class %} atendimentos-layout{% endblock %}
 {% block content %}
 <section class="painel atendimentos">
-  <h2>Atendimentos</h2>
-  <button type="button" class="btn-primario" id="btn-iniciar-atendimento">Iniciar atendimento</button>
+  <div class="section-toolbar">
+    <div>
+      <h2>Atendimentos recentes</h2>
+      <p class="section-hint">Acompanhe comandas abertas e encerradas.</p>
+    </div>
+    <button type="button" class="btn-primario" id="btn-iniciar-atendimento">Iniciar atendimento</button>
+  </div>
   <p id="mensagem-atendimentos" role="alert"></p>
   <div class="lista" id="lista-atendimentos" aria-live="polite"></div>
 </section>

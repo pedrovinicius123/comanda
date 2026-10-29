@@ -3,21 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %} {% endblock %}</title>
-  {% block link %} {% endblock %}  
+  <title>{% block title %}Sabor da Orla{% endblock %}</title>
+  {% block link %}{% endblock %}
 </head>
 <body>
-  <header class="cabecalho">
-    <h1><a href="{{ url_for('index') }}">Sabor da Orla</a></h1>
-    <span class="data" id="data-atual"></span>
-  </header>
-  <nav class="menu" aria-label="Navegação principal">
-    <a href="{{ url_for('comandas') }}">Atendimentos</a>
-    <a href="{{ url_for('produtos') }}">Produtos</a>
-  </nav>
-  <div class="barra-secao">{% block section %}{% endblock %}</div>
-  <main class="conteudo">
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="{{ url_for('index') }}" aria-label="Sabor da Orla, início">
+        <span class="brand-mark" aria-hidden="true">SO</span>
+        <span class="brand-name">Sabor da Orla</span>
+      </a>
+      {% if request.endpoint not in ('login', 'logon') %}
+      <nav class="primary-nav" aria-label="Navegação principal">
+        <a class="nav-link{% if request.endpoint == 'comandas' %} is-active{% endif %}"
+           href="{{ url_for('comandas') }}"{% if request.endpoint == 'comandas' %} aria-current="page"{% endif %}>Atendimentos</a>
+        <a class="nav-link{% if request.endpoint == 'produtos' %} is-active{% endif %}"
+           href="{{ url_for('produtos') }}"{% if request.endpoint == 'produtos' %} aria-current="page"{% endif %}>Produtos</a>
+      </nav>
+      {% endif %}
+    </header>
+    <div class="page-heading">
+      <p class="page-kicker">Sabor da Orla <span aria-hidden="true">/</span> Operação</p>
+      <h1>{% block section %}Visão geral{% endblock %}</h1>
+    </div>
+    <main class="conteudo{% block page_class %}{% endblock %}">
     {% block content %}{% endblock %}
-  </main>
+    </main>
+  </div>
   {% block script %}{% endblock %}
 </body>

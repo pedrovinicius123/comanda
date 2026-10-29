@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
+{% block page_class %} auth-layout{% endblock %}
 {% block content %}
 <section class="painel">
   {% if login %}

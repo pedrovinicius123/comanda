@@ -5,9 +5,10 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/produtos.css') }}">
 {% endblock %}
+{% block page_class %} produtos-layout{% endblock %}
 {% block content %}
 <section class="painel">
-  <h2>Adicionar produto à comanda</h2>
+  <h2>Adicionar produto</h2>
   <form id="form-produto">
     <div class="campo">
       <label for="id-commanda">Comanda</label>
@@ -32,7 +33,12 @@
   <p id="mensagem-produtos" role="alert"></p>
 </section>
 <section class="painel">
-  <h2>Produtos registrados</h2>
+  <div class="section-toolbar">
+    <div>
+      <h2>Produtos registrados</h2>
+      <p class="section-hint">Itens vinculados às comandas.</p>
+    </div>
+  </div>
   <div class="lista" id="lista-produtos" aria-live="polite"></div>
 </section>
 {% endblock %}

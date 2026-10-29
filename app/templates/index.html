@@ -1,19 +1,21 @@
 {% extends 'base.html' %}
-  {% block title %}
-  Sistema de Registro de Comandas
-  {% endblock %}
-
-  {% block  link %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  {% endblock %}
-
-  {% block content %}
-  <nav class="menu">
-    <a href="{{ url_for('produtos') }}">Produtos</a>
-    <a href="{{ url_for('comandas') }}">Mesas</a>
-  </nav>
-
-  <p class="rodape">Estudo de Caso #1 — Programação Orientada a Serviços</p>
-  {% endblock %}
-</body>
-</html>
+{% block title %}Visão geral | Sabor da Orla{% endblock %}
+{% block section %}Visão geral{% endblock %}
+{% block link %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+{% block page_class %} home-layout{% endblock %}
+{% block content %}
+<nav class="quick-links" aria-label="Acesso rápido">
+  <a class="quick-link" href="{{ url_for('comandas') }}">
+    <span class="quick-link-index">01</span>
+    <span><strong>Atendimentos</strong><small>Acompanhar comandas e mesas em operação</small></span>
+    <span class="quick-link-arrow" aria-hidden="true">&#8594;</span>
+  </a>
+  <a class="quick-link" href="{{ url_for('produtos') }}">
+    <span class="quick-link-index">02</span>
+    <span><strong>Produtos</strong><small>Adicionar itens às comandas ativas</small></span>
+    <span class="quick-link-arrow" aria-hidden="true">&#8594;</span>
+  </a>
+</nav>
+{% endblock %}

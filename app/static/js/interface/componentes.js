@@ -45,12 +45,18 @@ export const renderComanda = (dados, aoAdicionarProduto) => {
 
     const acoes = document.createElement("div");
     acoes.className = "item-acoes";
-    acoes.append(criarBotao("Adicionar produto", "btn-editar", () => aoAdicionarProduto(comanda.id)));
+    if (aoAdicionarProduto) {
+        acoes.append(criarBotao("Adicionar produto", "btn-editar", () => aoAdicionarProduto(comanda.id)));
+    }
     item.append(info, produtos, acoes);
     return item;
 };
 
-export const renderAtendimento = (dados, { aoAdicionarComanda, aoFinalizar }) => {
+export const renderAtendimento = (dados, {
+    aoAdicionarComanda,
+    aoFinalizar,
+    aoAdicionarProduto,
+} = {}) => {
     const item = document.createElement("article");
     item.className = "item";
 
@@ -68,17 +74,19 @@ export const renderAtendimento = (dados, { aoAdicionarComanda, aoFinalizar }) =>
 
     const comandas = document.createElement("div");
     comandas.className = "comandas-atendimento";
-    dados.comandas.forEach((comanda) => {
-        comandas.append(renderComanda(comanda, aoAdicionarProduto));
+    (dados.comandas || []).forEach((comanda) => {
+        comandas.append(renderComanda(comanda, dados.fim ? undefined : aoAdicionarProduto));
     });
 
     const acoes = document.createElement("div");
     acoes.className = "item-acoes";
     if (!dados.fim) {
-        acoes.append(
-            criarBotao("Adicionar comanda", "btn-editar", () => aoAdicionarComanda(dados.id)),
-            criarBotao("Finalizar atendimento", "btn-secundario", () => aoFinalizar(dados.id)),
-        );
+        if (aoAdicionarComanda) {
+            acoes.append(criarBotao("Adicionar comanda", "btn-editar", () => aoAdicionarComanda(dados.id)));
+        }
+        if (aoFinalizar) {
+            acoes.append(criarBotao("Finalizar atendimento", "btn-secundario", () => aoFinalizar(dados.id)));
+        }
     }
 
     item.append(info, comandas, acoes);
