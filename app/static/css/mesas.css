@@ -1,22 +1,30 @@
-/* ============================================================
-   Estilos específicos da página de Mesas
-   ============================================================ */
-
-/* Não reservada: fundo branco e itálico */
-.badge.livre {
-    background: #ffffff;
-    font-style: italic;
+.conteudo:has(.atendimentos) {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-/* Reservada: fundo cinza claro e negrito */
-.badge.reservada {
-    background: #eaeaea;
-    font-weight: bold;
+.comandas-atendimento {
+  flex: 1 1 100%;
+  display: grid;
+  gap: 8px;
 }
 
-/* O número da mesa fica bloqueado durante a edição da localização */
-input:disabled {
-    background: #f0f0f0;
-    color: #777777;
-    cursor: not-allowed;
+.comanda-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 14px;
+  padding: 10px 0;
+  border-top: 1px solid #cccccc;
+}
+
+.produtos-comanda {
+  grid-column: 1 / -1;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 520px) {
+  .comanda-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

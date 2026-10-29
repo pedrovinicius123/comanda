@@ -1,117 +1,71 @@
-import { addMesa, updateMesa, removeMesa } from "../data/mesa.js"
-import { Mesa } from "../classes/Mesas.js"
-import { renderMesa } from "./componentes.js"
+import {
+    finalizarAtendimento,
+    getAtendimentos,
+    iniciarAtendimento,
+    registrarComanda,
+} from "../api/comanda.js";
+import { renderAtendimento } from "./componentes.js";
 
-let idEmEdicao = null;
+const listaAtendimentos = document.getElementById("lista-atendimentos");
+const botaoIniciar = document.getElementById("btn-iniciar-atendimento");
+const mensagem = document.getElementById("mensagem-atendimentos");
 
-const form             = document.getElementById('form-mesa');
-const campoNumero      = document.getElementById('numero');
-const campoLocalizacao = document.getElementById('localizacao');
-const campoReservada   = document.getElementById('reservada');
-const btnSalvar        = document.getElementById('btn-salvar');
-const btnCancelar      = document.getElementById('btn-cancelar');
-const tituloForm       = document.getElementById('titulo-form');
-const listaMesas       = document.getElementById('lista-mesas');
+const mostrarErro = (erro) => {
+    mensagem.textContent = erro.message;
+};
 
-/** Preenche o formulário com os dados da mesa selecionada. */
-function iniciarEdicao(id) {
+export async function renderizar() {
+    listaAtendimentos.replaceChildren();
+    mensagem.textContent = "";
 
-    const mesas = JSON.parse(localStorage.getItem("mesas") || "[]").map((mesa) =>
-        typeof mesa === "string" ? JSON.parse(mesa) : mesa
-    );
-    const mesa = mesas.find((m) => m.id === id);
-    if (!mesa) return;
-  
-    idEmEdicao = id;
-  
-    campoNumero.value      = mesa.numero;
-    campoNumero.disabled   = true;   // o número da mesa não é alterável
-    campoLocalizacao.value = mesa.localizacao;
-    campoReservada.value   = String(mesa.reservada);
-  
-    tituloForm.textContent = 'Alterar Mesa ' + mesa.numero;
-    btnSalvar.textContent  = 'Salvar';
-    btnCancelar.hidden     = false;
-  
-    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    campoLocalizacao.focus();
-}
-
-
-
-/** Reconstrói a lista de mesas a partir dos dados persistidos. */
-export function renderizar(){
-    listaMesas.innerHTML = '';
-    const mesas = JSON.parse(localStorage.getItem("mesas") || "[]").map((mesa) =>
-        typeof mesa === "string" ? JSON.parse(mesa) : mesa
-    );
-    if (mesas.length === 0) {
-        const vazio = document.createElement('p');
-        vazio.className = 'vazio';
-        vazio.textContent = 'Nenhuma mesa cadastrada.';
-        listaMesas.append(vazio);
-        return;
-    }
-
-    // Exibe em ordem crescente de número (sem alterar o array original)
-    const ordenadas = [...mesas].sort((a, b) => a.numero - b.numero);
-    ordenadas.forEach((mesaData) => {
-        const mesa = new Mesa(mesaData.id, mesaData.numero, mesaData.localizacao, mesaData.reservada);
-        listaMesas.appendChild(renderMesa(mesa, iniciarEdicao, renderizar));
-
-    });
-
-}
-
-
-function finalizarEdicao() {
-    idEmEdicao = null;
-    campoNumero.disabled = false;
-    form.reset();
-    tituloForm.textContent = 'Adicionar Mesa +';
-    btnSalvar.textContent  = 'Cadastrar';
-    btnCancelar.hidden     = true;
-}
-
-/* ------------------------------------------------------------
-    6. EVENTOS
-    ------------------------------------------------------------ */
-if (form != null){
-    form.addEventListener('submit', (evento) => {
-        evento.preventDefault();
-
-        if (idEmEdicao === null) {
-            // Cadastro: cria um novo objeto instanciado da classe Mesa
-            const numero      = parseInt(campoNumero.value, 10);
-            const localizacao = campoLocalizacao.value.trim();
-            const reservada   = campoReservada.value === 'true';
-
-            if (Number.isNaN(numero) || !localizacao) return;
-
-            updateMesa(new Mesa(numero, numero, localizacao, reservada));
-            form.reset();
-            campoNumero.focus();
-        } else {
-        // Alteração: modifica o objeto já existente no array
-            const mesas = JSON.parse(localStorage.getItem("mesas") || "[]").map((mesa) =>
-                typeof mesa === "string" ? JSON.parse(mesa) : mesa
-            );
-            const mesaExistente = mesas.find((m) => m.id === idEmEdicao);
-            const localizacao = campoLocalizacao.value.trim();
-            const reservada   = campoReservada.value === 'true';
-
-            if (mesaExistente && localizacao) {
-                updateMesa(new Mesa(mesaExistente.id, mesaExistente.numero, localizacao, reservada));
-            }
-
-            finalizarEdicao();
+    try {
+        const atendimentos = await getAtendimentos();
+        if (atendimentos.length === 0) {
+            const vazio = document.createElement("p");
+            vazio.className = "vazio";
+            vazio.textContent = "Nenhum atendimento registrado.";
+            listaAtendimentos.append(vazio);
+            return;
         }
-        renderizar();
-    });
+
+        atendimentos.forEach((atendimento) => {
+            listaAtendimentos.append(renderAtendimento(atendimento, {
+                aoAdicionarComanda: async (id) => {
+                    try {
+                        await registrarComanda(id);
+                        await renderizar();
+                    } catch (erro) {
+                        mostrarErro(erro);
+                    }
+                },
+                aoFinalizar: async (id) => {
+                    try {
+                        await finalizarAtendimento(id);
+                        await renderizar();
+                    } catch (erro) {
+                        mostrarErro(erro);
+                    }
+                },
+                aoAdicionarProduto: (id) => {
+                    window.location.href = `/produtos?comanda_id=${id}`;
+                },
+            }));
+        });
+    } catch (erro) {
+        mostrarErro(erro);
+    }
 }
 
-btnCancelar.addEventListener('click', () => {
-    finalizarEdicao();
-    renderizar();
+botaoIniciar.addEventListener("click", async () => {
+    botaoIniciar.disabled = true;
+    try {
+        await iniciarAtendimento();
+        await renderizar();
+    } catch (erro) {
+        mostrarErro(erro);
+    } finally {
+        botaoIniciar.disabled = false;
+    }
 });
 
+void renderizar();

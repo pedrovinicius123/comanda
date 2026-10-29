@@ -1,40 +1,52 @@
 {% extends 'base.html' %}
+{% block title %}{% if login %}Login{% else %}Cadastro{% endif %} | Sabor da Orla{% endblock %}
+{% block section %}{% if login %}Login{% else %}Cadastro de atendente{% endif %}{% endblock %}
 {% block link %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
-{% if not login %}
-    {% block title %}
-    Registro | Sistema de Registro de Comandas
-    {% endblock %}
-
-    {% block content %}
-    <form action="{{ url_for('atendentes.login') }}" method="post">
-        <label for="name">Nome e Email</label>
-        <input type="text" name="name" id="name" placeholder="Nome" required>
-        <input type="text" name="email" id="email" placeholder="Email" required>
-        <label for="senha">Senha</label>
-        <input type="password" name="senha" id="senha" placeholder="Senha" required>
-        <input type="password" name="confirmacaoSenha" id="confirmacaoSenha" placeholder="Confirme sua senha" required>
-        <input type="submit" value="Entrar" onclick="confirmPasswordEquals()">
-    </form>
-    {% endblock %}
-
-{% else %}
-    {% block title %}
-    Login | Sistema de Registro de Comandas
-    {% endblock %}
-
-    {% block content %}
-    <form action="{{ url_for('atendentes.login') }}" method="post">
-        <label for="name">Nome ou email</label>
-        <input type="text" name="name_email" id="name_email" required>
-        <label for="senha">Senha</label>
-        <input type="text" name="senha" id="senha" placeholder="Senha" required>
-    </form>
-    <a href="{{ url_for('logon') }}">Não cadastrado? Crie uma conta.</a>
-    {% endblock %}
-{% endif %}
+{% block content %}
+<section class="painel">
+  {% if login %}
+  <h2>Entrar</h2>
+  <form data-auth-form action="{{ url_for('atendentes.login_atendente') }}" data-mode="login">
+    <div class="campo">
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" required autocomplete="email">
+    </div>
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input type="password" name="password" id="senha" required autocomplete="current-password">
+    </div>
+    <button type="submit" class="btn-primario">Entrar</button>
+  </form>
+  <p>Não cadastrado? <a href="{{ url_for('logon') }}">Crie uma conta.</a></p>
+  {% else %}
+  <h2>Criar atendente</h2>
+  <form data-auth-form action="{{ url_for('atendentes.registrar_atendente') }}" data-mode="register">
+    <div class="campo">
+      <label for="nome">Nome</label>
+      <input type="text" name="name" id="nome" required autocomplete="name">
+    </div>
+    <div class="campo">
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" required autocomplete="email">
+    </div>
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input type="password" name="password" id="senha" required autocomplete="new-password">
+    </div>
+    <div class="campo">
+      <label for="confirmacaoSenha">Confirme a senha</label>
+      <input type="password" id="confirmacaoSenha" required autocomplete="new-password">
+    </div>
+    <button type="submit" class="btn-primario">Cadastrar</button>
+  </form>
+  <p>Já possui cadastro? <a href="{{ url_for('login') }}">Entre aqui.</a></p>
+  {% endif %}
+  <p id="auth-mensagem" role="alert"></p>
+</section>
+{% endblock %}
 {% block script %}
-<script src="{{ url_for('static', filename='js/script_form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script_form.js') }}" defer></script>
 {% endblock %}

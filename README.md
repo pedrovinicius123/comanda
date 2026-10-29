@@ -25,7 +25,7 @@ O login usa sessão do Flask. Primeiro crie um atendente:
 POST /atendentes/register
 Content-Type: application/json
 
-{"password": "segredo"}
+{"name": "Ana", "email": "ana@example.com", "password": "segredo"}
 ```
 
 Depois faça login. O cookie de sessão deve ser mantido nas chamadas seguintes:
@@ -34,7 +34,7 @@ Depois faça login. O cookie de sessão deve ser mantido nas chamadas seguintes:
 POST /atendentes/login
 Content-Type: application/json
 
-{"id": 1, "password": "segredo"}
+{"email": "ana@example.com", "password": "segredo"}
 ```
 
 As rotas sob `/atendimentos` exigem autenticação e respondem `401` quando não existe uma sessão válida.
@@ -43,10 +43,11 @@ As rotas sob `/atendimentos` exigem autenticação e respondem `401` quando não
 
 | Método | Rota | Descrição | Resposta de sucesso |
 | --- | --- | --- | --- |
-| `POST` | `/atendentes/register` | Cadastra atendente. | `201` |
-| `POST` | `/atendentes/login` | Inicia a sessão do atendente. | `200` |
+| `POST` | `/atendentes/register` | Cadastra atendente com nome, email e senha. | `201` |
+| `POST` | `/atendentes/login` | Inicia a sessão pelo email ou ID. | `200` |
 | `PATCH` | `/atendentes/update` | Atualiza a senha usando `{"id": 1, "password": "nova"}`. | `200` |
 | `DELETE` | `/atendentes/delete` | Remove atendente usando `{"id": 1}`. | `200` |
+| `GET` | `/atendimentos/` | Lista atendimentos, comandas e produtos. | `200` |
 | `POST` | `/atendimentos/` | Abre atendimento e sua primeira comanda. | `201` |
 | `PUT` | `/atendimentos/` | Finaliza atendimento usando `{"id": 1}`. | `200` |
 | `POST` | `/atendimentos/comandas` | Cria comanda com `id_atendimento` e, opcionalmente, `valor_a_pagar`. | `201` |

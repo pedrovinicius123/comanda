@@ -1,50 +1,18 @@
 {% extends 'base.html' %}
-  {% block title %} Mesas | Sabor da Orla {% endblock %}
-  {% block link %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/mesas.css') }}">
-  {% endblock %}
-  {% block content %}
-
-  <!-- Painel esquerdo: formulário -->
-  <section class="painel">
-    <h2 id="titulo-form">Adicionar Mesa +</h2>
-
-    <form id="form-mesa">
-      <div class="campo">
-        <label for="numero">Número</label>
-        <input type="number" id="numero" min="1" step="1" required>
-      </div>
-
-      <div class="campo">
-        <label for="localizacao">Localização</label>
-        <input type="text" id="localizacao" required>
-      </div>
-
-      <div class="campo">
-        <label for="reservada">Situação de reserva</label>
-        <select id="reservada">
-          <option value="false">Não reservada</option>
-          <option value="true">Reservada</option>
-        </select>
-      </div>
-
-      <div class="botoes">
-        <button type="submit" class="btn-primario" id="btn-salvar">Cadastrar</button>
-        <button type="button" class="btn-secundario" id="btn-cancelar" hidden>Cancelar</button>
-      </div>
-    </form>
-  </section>
-
-  <!-- Painel direito: lista -->
-  <section class="painel">
-    <h2>Mesas Cadastradas</h2>
-    <div class="lista" id="lista-mesas"></div>
-  </section>
-
-  {% endblock %}
-  {% block script %}
-  <script type="module" src="{{ url_for('static', filename='js/script_mesa.js') }}"></script>
-  {% endblock %}
-</body>
-</html>
+{% block title %}Atendimentos | Sabor da Orla{% endblock %}
+{% block section %}Atendimentos{% endblock %}
+{% block link %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mesas.css') }}">
+{% endblock %}
+{% block content %}
+<section class="painel atendimentos">
+  <h2>Atendimentos</h2>
+  <button type="button" class="btn-primario" id="btn-iniciar-atendimento">Iniciar atendimento</button>
+  <p id="mensagem-atendimentos" role="alert"></p>
+  <div class="lista" id="lista-atendimentos" aria-live="polite"></div>
+</section>
+{% endblock %}
+{% block script %}
+<script type="module" src="{{ url_for('static', filename='js/script_comanda.js') }}"></script>
+{% endblock %}

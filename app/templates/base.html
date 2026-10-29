@@ -7,28 +7,17 @@
   {% block link %} {% endblock %}  
 </head>
 <body>
-
-<!-- Barra superior -->
-  <div class="topo">
-    <button type="button" title="Disponível em etapas futuras">Histórico</button>
-    <button type="button" title="Disponível em etapas futuras">{{user.name}}</button>
-  </div>
-
-  <!-- Cabeçalho -->
   <header class="cabecalho">
-    <h1><a href="index.html">Sabor da Orla</a></h1>
+    <h1><a href="{{ url_for('index') }}">Sabor da Orla</a></h1>
     <span class="data" id="data-atual"></span>
   </header>
-
-  <!-- Barra de seção -->
-  <div class="barra-secao">{% block section %} {% endblock %}</div>
-
-  <!-- Conteúdo -->
+  <nav class="menu" aria-label="Navegação principal">
+    <a href="{{ url_for('comandas') }}">Atendimentos</a>
+    <a href="{{ url_for('produtos') }}">Produtos</a>
+  </nav>
+  <div class="barra-secao">{% block section %}{% endblock %}</div>
   <main class="conteudo">
-  {% block content %}
-  {% endblock %}
+    {% block content %}{% endblock %}
   </main>
-
-  {% block script %}
-  {% endblock %}
+  {% block script %}{% endblock %}
 </body>

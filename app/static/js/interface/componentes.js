@@ -1,110 +1,111 @@
-import { updateProduto } from "../data/produtos.js";
-import { updateMesa } from "../data/mesa.js";
+import { Comanda } from "../classes/Comandas.js";
 
-/** Cria o elemento de produto e conecta edição, disponibilidade e atualização da lista.
- * @param {import("../classes/Produtos.js").Produto} produto
- */
-export const renderProduto = (produto, edit_callback, render_callback) => {
-    /* ---- Bloco de informações ---- */
-    const info = document.createElement('div');
-    info.className = 'item-info';
+const formatarData = (valor) => valor
+    ? new Date(valor).toLocaleString("pt-BR")
+    : "Em andamento";
 
-    const titulo = document.createElement('h3');
-    titulo.textContent = produto.nome;
+const criarBotao = (texto, classe, acao) => {
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = classe;
+    botao.textContent = texto;
+    botao.addEventListener("click", acao);
+    return botao;
+};
 
-    const descricao = document.createElement('p');
-    descricao.className = 'descricao';
-    descricao.textContent = produto.descricao;
-
-    const preco = document.createElement('p');
-    preco.className = 'preco';
-    preco.textContent = produto.precoFormatado();
-
-    info.append(titulo, descricao, preco);
-
-    /* ---- Bloco de ações ---- */
-    const acoes = document.createElement('div');
-    acoes.className = 'item-acoes';
-
-    // Ação própria de disponibilidade (o clique alterna a situação)
-    const btnDisponibilidade = document.createElement('button');
-    btnDisponibilidade.type = 'button';
-    btnDisponibilidade.className =
-      'badge ' + (produto.disponivel ? 'disponivel' : 'indisponivel');
-    btnDisponibilidade.textContent =
-      produto.disponivel ? 'Disponível' : 'Indisponível';
-    btnDisponibilidade.title = 'Clique para alternar a disponibilidade';
-    
-    btnDisponibilidade.addEventListener('click', () => {
-      produto.alternarDisponibilidade();
-      updateProduto(produto);
-      render_callback();
-    });
-
-    // Ação de edição
-    const btnEditar = document.createElement('button');
-    btnEditar.type = 'button';
-    btnEditar.className = 'btn-editar';
-    btnEditar.textContent = 'Alterar';
-    btnEditar.addEventListener('click', () => edit_callback(produto.id));
-
-    acoes.append(btnDisponibilidade, btnEditar);
-
-    /* ---- Montagem do item ---- */
+export const renderComanda = (dados, aoAdicionarProduto) => {
+    const comanda = new Comanda(dados);
     const item = document.createElement("article");
-    item.className = 'item';
-    item.append(info, acoes);
+    item.className = "comanda-item";
 
-    return item
-}
+    const info = document.createElement("div");
+    info.className = "item-info";
+    const titulo = document.createElement("h3");
+    titulo.textContent = `Comanda #${comanda.id}`;
+    const saldo = document.createElement("p");
+    saldo.className = "preco";
+    saldo.textContent = Number(comanda.valor_a_pagar).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    });
+    info.append(titulo, saldo);
 
-/** Cria o elemento de mesa e conecta edição, reserva e atualização da lista.
- * @param {import("../classes/Mesas.js").Mesa} mesa
- */
-export const renderMesa = (mesa, edit_callback, render_callback) => {
-    /* ---- Bloco de informações ---- */
-    const info = document.createElement('div');
-    info.className = 'item-info';
+    const produtos = document.createElement("ul");
+    produtos.className = "produtos-comanda";
+    comanda.produtos.forEach((produto) => {
+        const linha = document.createElement("li");
+        linha.textContent = `${produto.nome} - ${produto.precoFormatado}`;
+        produtos.append(linha);
+    });
+    if (comanda.produtos.length === 0) {
+        const vazio = document.createElement("li");
+        vazio.textContent = "Sem produtos";
+        produtos.append(vazio);
+    }
 
-    const titulo = document.createElement('h3');
-    titulo.textContent = 'Mesa ' + mesa.numero;
+    const acoes = document.createElement("div");
+    acoes.className = "item-acoes";
+    acoes.append(criarBotao("Adicionar produto", "btn-editar", () => aoAdicionarProduto(comanda.id)));
+    item.append(info, produtos, acoes);
+    return item;
+};
 
-    const localizacao = document.createElement('p');
-    localizacao.className = 'descricao';
-    localizacao.textContent = mesa.localizacao;
+export const renderAtendimento = (dados, { aoAdicionarComanda, aoFinalizar }) => {
+    const item = document.createElement("article");
+    item.className = "item";
 
-    info.append(titulo, localizacao);
+    const info = document.createElement("div");
+    info.className = "item-info";
+    const titulo = document.createElement("h3");
+    titulo.textContent = `Atendimento #${dados.id}`;
+    const inicio = document.createElement("p");
+    inicio.className = "descricao";
+    inicio.textContent = `Início: ${formatarData(dados.inicio)}`;
+    const fim = document.createElement("p");
+    fim.className = "descricao";
+    fim.textContent = `Fim: ${dados.fim ? formatarData(dados.fim) : "Em andamento"}`;
+    info.append(titulo, inicio, fim);
 
-    /* ---- Bloco de ações ---- */
-    const acoes = document.createElement('div');
-    acoes.className = 'item-acoes';
-
-    // Ação própria de reserva (o clique alterna a situação)
-    const btnReserva = document.createElement('button');
-
-    btnReserva.type = 'button';
-    btnReserva.className = 'badge ' + (mesa.reservada ? 'reservada' : 'livre');
-    btnReserva.textContent = mesa.situacaoFormatada;
-    btnReserva.title = 'Clique para alternar a situação de reserva';
-    btnReserva.addEventListener('click', () => {
-      mesa.alternarReserva();
-      updateMesa(mesa);
-      render_callback();
+    const comandas = document.createElement("div");
+    comandas.className = "comandas-atendimento";
+    dados.comandas.forEach((comanda) => {
+        comandas.append(renderComanda(comanda, aoAdicionarProduto));
     });
 
-    // Ação de edição da localização (e também da reserva)
-    const btnEditar = document.createElement('button');
-    btnEditar.type = 'button';
-    btnEditar.className = 'btn-editar';
-    btnEditar.textContent = 'Alterar';
-    btnEditar.addEventListener('click', () => edit_callback(mesa.id));
+    const acoes = document.createElement("div");
+    acoes.className = "item-acoes";
+    if (!dados.fim) {
+        acoes.append(
+            criarBotao("Adicionar comanda", "btn-editar", () => aoAdicionarComanda(dados.id)),
+            criarBotao("Finalizar atendimento", "btn-secundario", () => aoFinalizar(dados.id)),
+        );
+    }
 
-    acoes.append(btnReserva, btnEditar);
-
-    /* ---- Montagem do item ---- */
-    const item = document.createElement('article');
-    item.className = 'item';
-    item.append(info, acoes);
-
+    item.append(info, comandas, acoes);
     return item;
-  }
+};
+
+export const renderProduto = (produto) => {
+    const item = document.createElement("article");
+    item.className = "item";
+    const info = document.createElement("div");
+    info.className = "item-info";
+
+    const nome = document.createElement("h3");
+    nome.textContent = produto.nome;
+    const descricao = document.createElement("p");
+    descricao.className = "descricao";
+    descricao.textContent = produto.descricao || "Sem descrição";
+    const preco = document.createElement("p");
+    preco.className = "preco";
+    preco.textContent = Number(produto.preco).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    });
+    const vinculo = document.createElement("p");
+    vinculo.className = "descricao";
+    vinculo.textContent = `Comanda #${produto.id_commanda}`;
+    info.append(nome, descricao, preco, vinculo);
+    item.append(info);
+    return item;
+};

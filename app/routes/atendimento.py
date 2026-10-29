@@ -1,10 +1,11 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from flask_login import login_required
 
 from ..controllers.comandas import (
     adicionar_produtos_controller,
     finalizar_atendimento_controller,
     iniciar_atendimento_controller,
+    listar_atendimentos_controller,
     pagar_comandas_parcial_controller,
     registrar_comanda_controller,
 )
@@ -14,32 +15,33 @@ bp = Blueprint("atendimentos", __name__, url_prefix="/atendimentos")
 @bp.route("/", methods=["POST"])
 @login_required
 def iniciar_atendimento():
-    iniciar_atendimento_controller()
-    return "Atendimento iniciado com sucesso", 201
+    return jsonify(iniciar_atendimento_controller()), 201
+
+
+@bp.route("/", methods=["GET"])
+@login_required
+def listar_atendimentos():
+    return jsonify(listar_atendimentos_controller())
 
 @bp.route("/", methods=["PUT"])
 @login_required
 def finalizar_atendimento():
-    finalizar_atendimento_controller()
-    return "Atendimento finalizado com sucesso", 200
+    return jsonify(finalizar_atendimento_controller())
 
 
 @bp.route("/comandas", methods=["POST"])
 @login_required
 def registrar_comanda():
-    registrar_comanda_controller()
-    return "Comanda registrada com sucesso", 201
+    return jsonify(registrar_comanda_controller()), 201
 
 
 @bp.route("/comandas", methods=["PUT"])
 @login_required
 def pagar_comandas_parcial():
-    pagar_comandas_parcial_controller()
-    return "Valor pago com sucesso", 200
+    return jsonify(pagar_comandas_parcial_controller())
 
 
 @bp.route("/comandas", methods=["PATCH"])
 @login_required
 def adicionar_produtos():
-    adicionar_produtos_controller()
-    return "Produtos adicionados com sucesso", 200
+    return jsonify(adicionar_produtos_controller())

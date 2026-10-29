@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 
 from ..controllers.atendentes import (
     delete_atendente_controller,
@@ -19,13 +19,11 @@ def load_user(user_id:int):
 
 @bp.route("/register", methods=["POST"])
 def registrar_atendente():
-    registrar_atendente_controller()
-    return "Atendente registrado com sucesso", 201
+    return jsonify(registrar_atendente_controller()), 201
 
 @bp.route("/login", methods=["POST"])
 def login_atendente():
-    logar_atendente_controller()
-    return "Atendente logado com sucesso", 200
+    return jsonify(logar_atendente_controller())
 
 @bp.route("/delete", methods=["DELETE"])
 def delete_atendente():

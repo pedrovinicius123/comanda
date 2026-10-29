@@ -1,6 +1,7 @@
 import werkzeug.exceptions as exc
 from flask import Flask, jsonify, redirect, render_template, url_for
 from flask_migrate import Migrate
+from flask_login import login_required
 from marshmallow import ValidationError
 
 from .config import Config
@@ -49,6 +50,21 @@ def create_app():
     @lm.unauthorized_handler
     def unauthorized():
         return redirect(url_for("login"))
+
+    @app.route("/")
+    @login_required
+    def index():
+        return render_template("index.html")
+
+    @app.route("/comandas")
+    @login_required
+    def comandas():
+        return render_template("mesas.html")
+
+    @app.route("/produtos")
+    @login_required
+    def produtos():
+        return render_template("produtos.html")
 
     app.register_blueprint(bp_atendente)
     app.register_blueprint(bp_atendimento)
